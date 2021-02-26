@@ -23,7 +23,11 @@ module.exports.Login = async (req, res) => {
             expiresIn: process.env.ACCESS_TOKEN_LIFE
         })
 
-    return res.send({error: false, token: token})
+    const data = {
+        token: token,
+        user: user
+    }
+    return res.send({error: false, data: data})
 }
 
 module.exports.SignUp = async (req, res) => {
