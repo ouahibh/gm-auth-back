@@ -1,0 +1,5 @@
+/node_modules/
+/fullstack_exemple.zip
+/yarn.lock
+/package-lock.json
+/.idea/
