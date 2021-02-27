@@ -2,7 +2,7 @@ const User = require('../model/user')
 const bcrypt = require('bcrypt')
 const jwt = require('jsonwebtoken')
 const fileUpload = require('express-fileupload');
-
+const File = require('../model/file')
 module.exports.Login = async (req, res) => {
     const email = req.body.email;
     const password = req.body.password;
@@ -23,7 +23,11 @@ module.exports.Login = async (req, res) => {
             expiresIn: process.env.ACCESS_TOKEN_LIFE
         })
 
-    return res.send({error: false, token: token})
+    const data = {
+        token: token,
+        user: user
+    }
+    return res.send({error: false, data: data})
 }
 
 module.exports.SignUp = async (req, res) => {
@@ -93,4 +97,35 @@ module.exports.Uplaod = (req, res) => {
         // returing the response with file path and name
         return res.send({name: file.name, path: `/${file.name}`});
     });
+}
+module.exports.UplaodWithData = (req, res) => {
+    console.log(req.files)
+    console.log(req.body)
+    if (!req.files) {
+        return res.send({error: true, mas: 'files not sended !'})
+    }
+    const file = req.files.file;
+    if (!file) {
+        return res.send({error: true, mas: 'File not sended !'})
+    }
+    //  mv() method places the file inside public directory
+
+    file.mv(`${__dirname}/../public/${file.name}`, (err) => {
+        if (err) {
+            console.log(err)
+            return res.send({error: true, msg: "Error occured"});
+        }
+        // returing the response with file path and name
+    });
+    const f = new File();
+    f.name = req.body.name;
+    f.cat = req.body.cat;
+    f.path = '/' + file.name;
+    f.save().then(r => {
+        res.send({error: false, msg: 'OK'})
+    })
+        .catch(err => {
+            res.send({error: true, msg: 'Not OK'})
+        })
+
 }
